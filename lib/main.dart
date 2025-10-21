@@ -163,11 +163,76 @@ class _TaskListScreenState extends State<TaskListScreen> {
     });
     _saveTasks();
   }
-  
+
   void _clearCompleted() {
     setState(() {
       _tasks.removeWhere((t) => t.completed);
     });
     _saveTasks();
   }
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Task Manager'),
+        actions: [
+          // Theme switch (Light/Dark)
+          Row(
+            children: [
+              Icon(widget.isDarkMode ? Icons.dark_mode : Icons.light_mode),
+              Switch(
+                value: widget.isDarkMode,
+                onChanged: (v) => widget.onThemeChanged(v),
+              ),
+            ],
+          ),
+          // Clear completed button
+          IconButton(
+            tooltip: 'Clear completed tasks',
+            icon: const Icon(Icons.delete_sweep),
+            onPressed: _tasks.any((t) => t.completed) ? _clearCompleted : null,
+          ),
+        ],
+      ),
+      
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                // Input area
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: [
+                      // Task text input
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          onSubmitted: (_) => _addTask(),
+                          decoration: InputDecoration(
+                            hintText: 'Enter a task name',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // Add button
+                      ElevatedButton(
+                        onPressed: _addTask,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text('Add'),
+                      ),
+                    ],
+                  ),
+                ),
