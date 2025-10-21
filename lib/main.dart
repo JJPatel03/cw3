@@ -65,3 +65,24 @@ class _TaskAppState extends State<TaskApp> {
     );
   }
 }
+
+class ThemeStorage {
+  static const String keyIsDark = 'is_dark_theme_v1';
+}
+
+class Task {
+  String title;
+  bool completed;
+
+  Task({required this.title, this.completed = false});
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'completed': completed,
+      };
+
+  factory Task.fromJson(Map<String, dynamic> json) => Task(
+        title: json['title'] ?? '',
+        completed: json['completed'] ?? false,
+      );
+}
