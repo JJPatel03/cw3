@@ -100,3 +100,39 @@ class TaskListScreen extends StatefulWidget {
   @override
   State<TaskListScreen> createState() => _TaskListScreenState();
 }
+
+class _TaskListScreenState extends State<TaskListScreen> {
+  final TextEditingController _controller = TextEditingController();
+  List<Task> _tasks = [];
+  bool _loading = true;
+
+  static const String tasksKey = 'task_list_v1';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks(); // Load tasks when app starts
+  }
+
+  Future<void> _loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(tasksKey);
+    if (raw != null) {
+      try {
+        final List decoded = json.decode(raw) as List;
+        _tasks = decoded.map((e) => Task.fromJson(Map<String, dynamic>.from(e))).toList();
+      } catch (e) {
+        _tasks = [];
+      }
+    } else {
+      _tasks = [];
+    }
+    setState(() {
+      _loading = false;
+    });
+  }
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = json.encode(_tasks.map((t) => t.toJson()).toList());
+    await prefs.setString(tasksKey, raw);
+  }
