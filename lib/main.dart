@@ -131,8 +131,20 @@ class _TaskListScreenState extends State<TaskListScreen> {
       _loading = false;
     });
   }
+
   Future<void> _saveTasks() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = json.encode(_tasks.map((t) => t.toJson()).toList());
     await prefs.setString(tasksKey, raw);
+  }
+  
+  void _addTask() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      _tasks.insert(0, Task(title: text));
+      _controller.clear();
+    });
+    _saveTasks();
   }
