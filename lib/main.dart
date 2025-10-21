@@ -86,3 +86,17 @@ class Task {
         completed: json['completed'] ?? false,
       );
 }
+
+class TaskListScreen extends StatefulWidget {
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
+
+  const TaskListScreen({
+    Key? key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  }) : super(key: key);
+
+  @override
+  State<TaskListScreen> createState() => _TaskListScreenState();
+}
