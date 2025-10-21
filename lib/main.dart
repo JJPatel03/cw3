@@ -196,7 +196,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
           ),
         ],
       ),
-      
+
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -236,3 +236,80 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     ],
                   ),
                 ),
+
+                // Summary text
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    children: [
+                      Text('${_tasks.length} task${_tasks.length == 1 ? '' : 's'}'),
+                      const SizedBox(width: 12),
+                      Text('${_tasks.where((t) => t.completed).length} completed'),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Task list
+                Expanded(
+                  child: _tasks.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No tasks yet — add one above!',
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          itemCount: _tasks.length,
+                          itemBuilder: (context, index) {
+                            final task = _tasks[index];
+                            return Dismissible(
+                              key: ValueKey(task.title + index.toString()),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.error,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(Icons.delete, color: Colors.white),
+                              ),
+                              onDismissed: (_) => _deleteTask(index),
+                              child: Card(
+                                margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ListTile(
+                                  leading: Checkbox(
+                                    value: task.completed,
+                                    onChanged: (v) => _toggleTaskCompleted(index, v),
+                                  ),
+                                  title: Text(
+                                    task.title,
+                                    style: TextStyle(
+                                      decoration: task.completed
+                                          ? TextDecoration.lineThrough
+                                          : TextDecoration.none,
+                                      color: task.completed ? theme.disabledColor : null,
+                                    ),
+                                  ),
+                                  trailing: IconButton(
+                                    tooltip: 'Delete task',
+                                    icon: const Icon(Icons.delete_outline),
+                                    onPressed: () => _confirmAndDelete(index),
+                                  ),
+                                  onTap: () =>
+                                      _toggleTaskCompleted(index, !task.completed),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+
