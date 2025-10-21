@@ -6,3 +6,62 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Ensures async calls before runApp
   runApp(TaskApp());
 }
+
+class TaskApp extends StatefulWidget {
+  @override
+  State<TaskApp> createState() => _TaskAppState();
+}
+
+class _TaskAppState extends State<TaskApp> {
+  bool _isDarkMode = false;
+  bool _loaded = false; // Used to wait until theme loads before showing UI
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTheme();
+  }
+
+  // Load saved theme preference
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getBool(ThemeStorage.keyIsDark) ?? false;
+    setState(() {
+      _isDarkMode = saved;
+      _loaded = true;
+    });
+  }
+
+  // Toggle and save theme mode
+  void _toggleTheme(bool isDark) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(ThemeStorage.keyIsDark, isDark);
+    setState(() {
+      _isDarkMode = isDark;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Wait until theme preference loads
+    if (!_loaded) return const SizedBox.shrink();
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Task Manager',
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.indigo,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.indigo,
+      ),
+      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: TaskListScreen(
+        isDarkMode: _isDarkMode,
+        onThemeChanged: _toggleTheme,
+      ),
+    );
+  }
+}
