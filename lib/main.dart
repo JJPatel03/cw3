@@ -137,7 +137,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
     final raw = json.encode(_tasks.map((t) => t.toJson()).toList());
     await prefs.setString(tasksKey, raw);
   }
-  
+
   void _addTask() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
@@ -148,3 +148,26 @@ class _TaskListScreenState extends State<TaskListScreen> {
     });
     _saveTasks();
   }
+
+  void _toggleTaskCompleted(int index, bool? value) {
+    if (value == null) return;
+    setState(() {
+      _tasks[index].completed = value;
+    });
+    _saveTasks();
+  }
+
+  void _deleteTask(int index) {
+    setState(() {
+      _tasks.removeAt(index);
+    });
+    _saveTasks();
+  }
+  
+  void _clearCompleted() {
+    setState(() {
+      _tasks.removeWhere((t) => t.completed);
+    });
+    _saveTasks();
+  }
+
